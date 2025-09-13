@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Phone Installment Calculator</title>
+  <style>
+    :root { font-family: system-ui, Arial, sans-serif; }
+    body { margin: 0; padding: 24px; background:#f7f8fb; }
+    .card { max-width: 760px; margin: 0 auto; background:#fff; border-radius: 16px; padding: 20px 22px; box-shadow: 0 8px 28px rgba(0,0,0,.06); }
+    h1 { font-size: 20px; margin: 0 0 14px; }
+    .grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+    .row { display: grid; gap: 6px; }
+    label { font-size: 13px; color:#344054; }
+    select, input {
+      padding: 10px 12px; border:1px solid #d6d9df; border-radius: 10px; font-size: 14px; background:#fff; outline: none;
+    }
+    select:focus, input:focus { border-color:#6aa6ff; box-shadow: 0 0 0 3px rgba(106,166,255,.25); }
+    .muted { color:#667085; font-size: 12px; }
+    .summary { margin-top: 16px; background:#fafbff; border:1px dashed #d6d9df; border-radius: 12px; padding: 12px; }
+    .summary p { margin: 6px 0; }
+    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    th, td { text-align: right; padding: 10px 8px; border-bottom: 1px solid #eef0f4; font-variant-numeric: tabular-nums; }
+    th:first-child, td:first-child { text-align: left; }
+    tfoot td { font-weight: 600; }
+    .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; background:#eef2ff; color:#3730a3; margin-left: 6px; }
+    .actions { margin-top: 10px; display: flex; gap: 8px; }
+    button { padding: 10px 14px; border-radius: 10px; border:1px solid #d6d9df; background:#fff; cursor: pointer; }
+    button:hover { border-color:#6aa6ff; box-shadow: 0 0 0 3px rgba(106,166,255,.18); }
+    @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Phone Installment Calculator
+      <span class="pill">3/4 → ×1.10 • 5 → ×1.15 • olo3 → ×1.10 then 50/25/25</span>
+    </h1>
+
+    <div class="grid">
+      <div class="row">
+        <label for="visa">Visa type</label>
+        <select id="visa">
+          <option value="" selected>Select Visa type…</option>
+          <option value="Visa1">E9,D2,F2,E7</option>
+          <option value="Visa2">F6</option>
+          <option value="Visa3">D4</option>
+          <option value="Visa4">A1</option>
+          <option value="Visa5">F</option>
+          <option value="Visa6">O,G1,E10</option>
+        </select>
+        <div class="muted">Choose card group; it controls which plans are allowed.</div>
+      </div>
+
+      <div class="row">
+        <label for="months">Installment plan</label>
+        <select id="months" disabled>
+          <option value="">Select plan…</option>
+        </select>
+        <div class="muted">Options depend on Visa type (supports numbers & special plan "olo3").</div>
+      </div>
+
+      <div class="row">
+        <label for="price">Phone price</label>
+        <input id="price" type="number" min="0" step="1" placeholder="e.g., 35990" />
+        <div class="muted">Multiplier by plan: 3/4 → ×1.10, 5 → ×1.15. olo3 uses ×1.10 then 50/25/25 split.</div>
+      </div>
+
+      <div class="row">
+        <label for="discount">Second-month discount</label>
+        <input id="discount" type="number" min="0" step="1" value="0" />
+        <div class="muted">This amount is subtracted from the 2nd payment only (not below 0).</div>
+      </div>
+    </div>
+
+    <div class="summary">
+      <p><b>Total (after multiplier):</b> <span id="total">–</span></p>
+      <p><b>Monthly payment:</b> <span id="monthly">–</span></p>
+      <p class="muted">For equal plans: Monthly = Total ÷ Months. For olo3: 50% / 25% / 25% of Total.</p>
+    </div>
+
+    <table id="schedule" style="display:none">
+      <thead>
+        <tr><th>Payment</th><th>Amount</th></tr>
+      </thead>
+      <tbody></tbody>
+      <tfoot>
+        <tr><td>Total of payments shown</td><td id="sumShown">–</td></tr>
+      </tfoot>
+    </table>
+
+    <div class="actions">
+      <button id="copyBtn">📋 Copy Payment Schedule</button>
+    </div>
+  </div>
+  <div>
+    <img src="image/phone price 1.jpg" alt="">
+    <img src="image/phone price 2.jpg" alt="">
+    <img src="image/phone price 3.jpg" alt="">
+    <img src="image/discount.jpg" alt="">
+  </div>
+
+  <script>
+    // --- Configuration ---
+    const VISA_RULES = {
+      Visa1: [2, 3, 4, 5],
+      Visa2: [2, 3, "olo3"],
+      Visa3: [2, 3, 4, "olo3"],
+      Visa4: [2, 3, 4],
+      Visa5: ["to confirm to office"],
+      Visa6: ["olo3"]
+    };
+
+    // Month-based multiplier
+    function multiplierForMonths(months) {
+      if (months === 5) return 1.15;
+      if (months === 3 || months === 4) return 1.10;
+      return 1.00; // fallback for 2 or others
+    }
+
+    // --- Elements & helpers ---
+    const fmt = new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 });
+    const el = (id) => document.getElementById(id);
+    const visaSel = el('visa');
+    const monthsSel = el('months');
+    const priceInp = el('price');
+    const discountInp = el('discount');
+    const totalEl = el('total');
+    const monthlyEl = el('monthly');
+    const scheduleTbl = el('schedule');
+    const scheduleBody = scheduleTbl.querySelector('tbody');
+    const sumShownEl = el('sumShown');
+    const copyBtn = el('copyBtn');
+
+    let lastPayments = [];      // numbers of each payment
+    let lastPlanLabel = "";     // "3 months", "olo3 (50/25/25)", etc.
+
+    function optionLabel(m) {
+      if (typeof m === 'number' && Number.isFinite(m)) return `${m} month${m>1?'s':''}`;
+      if (m === 'olo3') return 'olo3 (50/25/25)';
+      return String(m); // show raw text for notes
+    }
+
+    function populateMonths() {
+      const v = visaSel.value;
+      monthsSel.innerHTML = '';
+      const allowed = VISA_RULES[v] || [];
+
+      if (!allowed.length) {
+        monthsSel.disabled = true;
+        monthsSel.innerHTML = '<option value="">Select plan…</option>';
+        return;
+      }
+
+      monthsSel.disabled = false;
+      const ph = document.createElement('option');
+      ph.value = '';
+      ph.textContent = 'Select plan…';
+      ph.disabled = true; ph.selected = true;
+      monthsSel.appendChild(ph);
+
+      allowed.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = String(m);
+        opt.textContent = optionLabel(m);
+        monthsSel.appendChild(opt);
+      });
+    }
+
+    // Burmese month labels up to 12
+    const burmeseLabels = [
+      "ပထမလအတွက်က", "ဒုတိယလအတွက်က", "တတိယလအတွက်က", "စတုတ္ထလအတွက်က", "ပဉ္စမလအတွက်က",
+      "ဆဌမလအတွက်က", "သတ္တမလအတွက်က", "အဠမလအတွက်က", "နဝမလအတွက်က", "ဒသမလအတွက်က",
+      "ဧကဒသမလအတွက်က", "ဒွဒသမလအတွက်က"
+    ];
+
+    function calcAndRender() {
+      const selValue = monthsSel.value;                         // "3" | "4" | "5" | "olo3" | "to confirm to office"
+      const price = Number(priceInp.value || 0);
+      const discount = Math.max(0, Number(discountInp.value || 0));
+
+      // Guard
+      if (!selValue || !isFinite(price) || price <= 0) {
+        totalEl.textContent = '–';
+        monthlyEl.textContent = '–';
+        scheduleTbl.style.display = 'none';
+        scheduleBody.innerHTML = '';
+        sumShownEl.textContent = '–';
+        lastPayments = [];
+        lastPlanLabel = '';
+        return;
+      }
+
+      let payments = [];
+      let total = 0;
+
+      if (selValue === "olo3") {
+        // olo3 behaves like a 3-month plan for multiplier
+        const months = 3;
+        const k = multiplierForMonths(months); // → 1.10
+        total = price * k;
+
+        payments = [
+          total * 0.50,
+          Math.max(0, total * 0.25 - discount),
+          total * 0.25
+        ];
+
+        totalEl.textContent = fmt.format(total);
+        monthlyEl.textContent = "Varies";
+      } else if (/^\d+$/.test(selValue)) {
+        // Normal numeric plan
+        const months = parseInt(selValue, 10);
+        const k = multiplierForMonths(months);
+        total = price * k;
+        const monthly = total / months;
+
+        for (let i = 1; i <= months; i++) {
+          let amt = monthly;
+          if (i === 2) amt = Math.max(0, monthly - discount);
+          payments.push(amt);
+        }
+
+        totalEl.textContent = fmt.format(total);
+        monthlyEl.textContent = fmt.format(monthly);
+      } else {
+        // Note / unsupported text
+        totalEl.textContent = '–';
+        monthlyEl.textContent = selValue;
+        scheduleTbl.style.display = 'none';
+        scheduleBody.innerHTML = '';
+        sumShownEl.textContent = '–';
+        lastPayments = [];
+        lastPlanLabel = selValue;
+        return;
+      }
+
+      // Save for copy
+      lastPayments = payments.slice();
+      lastPlanLabel = monthsSel.options[monthsSel.selectedIndex]?.textContent || "";
+
+      // Render schedule
+      scheduleBody.innerHTML = '';
+      let sum = 0;
+      payments.forEach((amt, i) => {
+        sum += amt;
+        const tr = document.createElement('tr');
+        const tdL = document.createElement('td');
+        const tdR = document.createElement('td');
+        tdL.textContent = `${i===0 ? 'First' : i===1 ? 'Second' : i===2 ? 'Third' : (i+1)+'th'} payment`;
+        tdR.textContent = fmt.format(amt);
+        tr.appendChild(tdL); tr.appendChild(tdR);
+        scheduleBody.appendChild(tr);
+      });
+      sumShownEl.textContent = fmt.format(sum);
+      scheduleTbl.style.display = '';
+    }
+
+    function copySchedule() {
+      if (!lastPayments.length) {
+        alert("ရွေးချယ်ပြီးတွက်ပြီးမှ ကော်ပီလုပ်နိုင်ပါတယ်။");
+        return;
+      }
+      let text = `---- ${lastPlanLabel} အတွက်ဆိုရင်တော့\n`;
+      lastPayments.forEach((amt, i) => {
+        const label = burmeseLabels[i] || `${i+1} လအတွက်က`;
+        text += `${label} ${fmt.format(amt)}\n`;
+      });
+      navigator.clipboard.writeText(text)
+        .then(() => alert("✅ Payment schedule copied!"))
+        .catch(() => alert("Copy failed—please allow clipboard permissions."));
+    }
+
+    // Events
+    visaSel.addEventListener('change', () => { populateMonths(); calcAndRender(); });
+    monthsSel.addEventListener('change', calcAndRender);
+    priceInp.addEventListener('input', calcAndRender);
+    discountInp.addEventListener('input', calcAndRender);
+    copyBtn.addEventListener('click', copySchedule);
+
+    // Init
+    populateMonths();
+    calcAndRender();
+  </script>
+</body>
+</html>
