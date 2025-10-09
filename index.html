@@ -268,7 +268,7 @@
       let text = `---- ${lastPlanLabel} အတွက်ဆိုရင်တော့\n`;
       lastPayments.forEach((amt, i) => {
         const label = burmeseLabels[i] || `${i+1} လအတွက်က`;
-        text += `${label} ${fmt.format(amt)}\n`;
+        text += `${label} ${fmt.format(amt)} w\n`;
       });
       navigator.clipboard.writeText(text)
         .then(() => alert("✅ Payment schedule copied!"))
