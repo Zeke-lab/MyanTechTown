@@ -46,9 +46,11 @@
           <option value="Visa3">D4</option>
           <option value="Visa4">A1</option>
           <option value="Visa5">F</option>
-          <option value="Visa6">O,G1,E10</option>
+          <option value="Visa6">G1</option>
+          <option value="Visa7">O,E10</option>
         </select>
         <div class="muted">Choose card group; it controls which plans are allowed.</div>
+        <div class="muted">သတ်တမ်းနည်းပြီး အရစ်ကျလ ပိုလိုချင်ရင် ရုံးကိုမေး</div>
       </div>
 
       <div class="row">
@@ -93,10 +95,10 @@
     </div>
   </div>
   <div>
-    <img src="image/phone price 1.jpg" alt="">
-    <img src="image/phone price 2.jpg" alt="">
-    <img src="image/phone price 3.jpg" alt="">
-    <img src="image/iphone 17.jpg" alt="">
+    <img src="image/ph price1.jpg" alt="">
+    <img src="image/ph price 2.jpg" alt="">
+    <img src="image/ph price 3.jpg" alt="">
+    <img src="image/iphone 17 (2).jpg" alt="">
     <img src="image/discount.jpg" alt="">
 
   </div>
@@ -106,10 +108,11 @@
     const VISA_RULES = {
       Visa1: [2, 3, 4, 5],
       Visa2: [2, 3, "olo3"],
-      Visa3: [2, 3, 4, "olo3"],
+      Visa3: ["4 (if >4month)", "olo3"],
       Visa4: [2, 3, 4],
       Visa5: ["to confirm to office"],
-      Visa6: ["olo3"]
+      Visa6: ["4 (if >4month)", "olo3"],
+      Visa7: ["olo3"]
     };
 
     // Month-based multiplier
