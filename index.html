@@ -1,108 +1,283 @@
 <!doctype html>
 <html lang="en">
+
 <head>
+   
   <meta charset="utf-8" />
+   
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Phone Installment Calculator</title>
-  <style>
-    :root { font-family: system-ui, Arial, sans-serif; }
-    body { margin: 0; padding: 24px; background:#f7f8fb; }
-    .card { max-width: 760px; margin: 0 auto; background:#fff; border-radius: 16px; padding: 20px 22px; box-shadow: 0 8px 28px rgba(0,0,0,.06); }
-    h1 { font-size: 20px; margin: 0 0 14px; }
-    .grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
-    .row { display: grid; gap: 6px; }
-    label { font-size: 13px; color:#344054; }
-    select, input {
-      padding: 10px 12px; border:1px solid #d6d9df; border-radius: 10px; font-size: 14px; background:#fff; outline: none;
+    <title>Phone Installment Calculator</title>
+    <style>
+    :root {
+      font-family: system-ui, Arial, sans-serif;
     }
-    select:focus, input:focus { border-color:#6aa6ff; box-shadow: 0 0 0 3px rgba(106,166,255,.25); }
-    .muted { color:#667085; font-size: 12px; }
-    .summary { margin-top: 16px; background:#fafbff; border:1px dashed #d6d9df; border-radius: 12px; padding: 12px; }
-    .summary p { margin: 6px 0; }
-    table { width: 100%; border-collapse: collapse; margin-top: 12px; }
-    th, td { text-align: right; padding: 10px 8px; border-bottom: 1px solid #eef0f4; font-variant-numeric: tabular-nums; }
-    th:first-child, td:first-child { text-align: left; }
-    tfoot td { font-weight: 600; }
-    .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; background:#eef2ff; color:#3730a3; margin-left: 6px; }
-    .actions { margin-top: 10px; display: flex; gap: 8px; }
-    button { padding: 10px 14px; border-radius: 10px; border:1px solid #d6d9df; background:#fff; cursor: pointer; }
-    button:hover { border-color:#6aa6ff; box-shadow: 0 0 0 3px rgba(106,166,255,.18); }
-    @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      background: #f7f8fb;
+    }
+
+    .card {
+      max-width: 760px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 16px;
+      padding: 20px 22px;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, .06);
+    }
+
+    h1 {
+      font-size: 20px;
+      margin: 0 0 14px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .row {
+      display: grid;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 13px;
+      color: #344054;
+    }
+
+    select,
+    input {
+      padding: 10px 12px;
+      border: 1px solid #d6d9df;
+      border-radius: 10px;
+      font-size: 14px;
+      background: #fff;
+      outline: none;
+    }
+
+    select:focus,
+    input:focus {
+      border-color: #6aa6ff;
+      box-shadow: 0 0 0 3px rgba(106, 166, 255, .25);
+    }
+
+    .muted {
+      color: #667085;
+      font-size: 12px;
+    }
+
+    .summary {
+      margin-top: 16px;
+      background: #fafbff;
+      border: 1px dashed #d6d9df;
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .summary p {
+      margin: 6px 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+
+    th,
+    td {
+      text-align: right;
+      padding: 10px 8px;
+      border-bottom: 1px solid #eef0f4;
+      font-variant-numeric: tabular-nums;
+    }
+
+    th:first-child,
+    td:first-child {
+      text-align: left;
+    }
+
+    tfoot td {
+      font-weight: 600;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      background: #eef2ff;
+      color: #3730a3;
+      margin-left: 6px;
+    }
+
+    .actions {
+      margin-top: 10px;
+      display: flex;
+      gap: 8px;
+    }
+
+    button {
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid #d6d9df;
+      background: #fff;
+      cursor: pointer;
+    }
+
+    button:hover {
+      border-color: #6aa6ff;
+      box-shadow: 0 0 0 3px rgba(106, 166, 255, .18);
+    }
+
+    /* --- NEW CSS FOR NOTE BOX --- */
+    .note-container {
+      margin-top: 16px;
+    }
+
+    .note-container .actions {
+      margin-top: 8px;
+      justify-content: flex-start;
+    }
+
+    #clearNoteBtn {
+      background: #fff9f9;
+      color: #d9534f;
+      border-color: #f3dede;
+    }
+
+    #clearNoteBtn:hover {
+      background: #fdf7f7;
+      border-color: #d9534f;
+    }
+
+    .note-display {
+      margin-top: 12px;
+      padding: 10px 14px;
+      background: #fffbeb;
+      /* Light yellow background */
+      border: 1px solid #fde68a;
+      border-radius: 12px;
+      display: none;
+      /* starts hidden */
+      white-space: pre-wrap;
+      /* respects line breaks */
+      word-break: break-word;
+      font-size: 14px;
+    }
+
+    .note-display.visible {
+      display: block;
+    }
+
+    /* --- END NEW CSS --- */
+
+    @media (max-width: 760px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
+
 <body>
-  <div class="card">
-    <h1>Phone Installment Calculator
-      <span class="pill">3/4 → ×1.10 • 5 → ×1.15 • olo3 → ×1.10 then 50/25/25</span>
-    </h1>
+    <div class="card">
+        <h1>Phone Installment Calculator
+            <span class="pill">3/4 → ×1.10 • 5 → ×1.15 • olo3 → ×1.10 then 50/25/25</span>
+          </h1>
 
-    <div class="grid">
+        <div class="grid">
+            <div class="row">
+                <label for="visa">Visa type</label>
+                <select id="visa">
+                    <option value="" selected>Select Visa type…</option>
+                    <option value="Visa1">E9,D2,F2,E7</option>
+                    <option value="Visa2">F6</option>
+                    <option value="Visa3">D4</option>
+                    <option value="Visa4">A1</option>
+                    <option value="Visa5">F</option>
+                    <option value="Visa6">G1</option>
+                    <option value="Visa7">O,E10</option>
+                  </select>
+                <div class="muted">Choose card group; it controls which plans are allowed.</div>
+                <div class="muted">သတ်တမ်းနည်းပြီး အရစ်ကျလ ပိုလိုချင်ရင် ရုံးကိုမေး</div>
+              </div>
+
+            <div class="row">
+                <label for="months">Installment plan</label>
+                <select id="months" disabled>
+                    <option value="">Select plan…</option>
+                  </select>
+                <div class="muted">Options depend on Visa type (supports numbers & special plan "olo3").</div>
+              </div>
+
+            <div class="row">
+                <label for="price">Phone price</label>
+                <input id="price" type="number" min="0" step="1" placeholder="e.g., 35990" />
+                <div class="muted">Multiplier by plan: 3/4 → ×1.10, 5 → ×1.15. olo3 uses ×1.10 then 50/25/25 split.
+        </div>
+              </div>
+
+            <div class="row">
+                <label for="discount">Second-month discount</label>
+                <input id="discount" type="number" min="0" step="1" value="0" />
+                <div class="muted">This amount is subtracted from the 2nd payment only (not below 0).</div>
+              </div>
+          </div>
+
+    <div class="note-container">
       <div class="row">
-        <label for="visa">Visa type</label>
-        <select id="visa">
-          <option value="" selected>Select Visa type…</option>
-          <option value="Visa1">E9,D2,F2,E7</option>
-          <option value="Visa2">F6</option>
-          <option value="Visa3">D4</option>
-          <option value="Visa4">A1</option>
-          <option value="Visa5">F</option>
-          <option value="Visa6">G1</option>
-          <option value="Visa7">O,E10</option>
-        </select>
-        <div class="muted">Choose card group; it controls which plans are allowed.</div>
-        <div class="muted">သတ်တမ်းနည်းပြီး အရစ်ကျလ ပိုလိုချင်ရင် ရုံးကိုမေး</div>
+        <label for="noteInput">Note</label>
+        <input type="text" id="noteInput" placeholder="Add an optional note (e.g., customer name, special deal)...">
       </div>
-
-      <div class="row">
-        <label for="months">Installment plan</label>
-        <select id="months" disabled>
-          <option value="">Select plan…</option>
-        </select>
-        <div class="muted">Options depend on Visa type (supports numbers & special plan "olo3").</div>
-      </div>
-
-      <div class="row">
-        <label for="price">Phone price</label>
-        <input id="price" type="number" min="0" step="1" placeholder="e.g., 35990" />
-        <div class="muted">Multiplier by plan: 3/4 → ×1.10, 5 → ×1.15. olo3 uses ×1.10 then 50/25/25 split.</div>
-      </div>
-
-      <div class="row">
-        <label for="discount">Second-month discount</label>
-        <input id="discount" type="number" min="0" step="1" value="0" />
-        <div class="muted">This amount is subtracted from the 2nd payment only (not below 0).</div>
+      <div class="actions">
+        <button id="saveNoteBtn">Save Note</button>
+        <button id="clearNoteBtn">Clear Note</button>
       </div>
     </div>
-
-    <div class="summary">
-      <p><b>Total (after multiplier):</b> <span id="total">–</span></p>
-      <p><b>Monthly payment:</b> <span id="monthly">–</span></p>
-      <p class="muted">For equal plans: Monthly = Total ÷ Months. For olo3: 50% / 25% / 25% of Total.</p>
+    <div id="noteDisplay" class="note-display">
     </div>
+        <div class="summary">
+            <p><b>Total (after multiplier):</b> <span id="total">–</span></p>
+            <p><b>Monthly payment:</b> <span id="monthly">–</span></p>
+            <p class="muted">For equal plans: Monthly = Total ÷ Months. For olo3: 50% / 25% / 25% of Total.</p>
+          </div>
 
-    <table id="schedule" style="display:none">
-      <thead>
-        <tr><th>Payment</th><th>Amount</th></tr>
-      </thead>
-      <tbody></tbody>
-      <tfoot>
-        <tr><td>Total of payments shown</td><td id="sumShown">–</td></tr>
-      </tfoot>
-    </table>
+        <table id="schedule" style="display:none">
+            <thead>
+                <tr>
+                    <th>Payment</th>
+                    <th>Amount</th>
+                  </tr>
+              </thead>
+            <tbody></tbody>
+            <tfoot>
+                <tr>
+                    <td>Total of payments shown</td>
+                    <td id="sumShown">–</td>
+                  </tr>
+              </tfoot>
+          </table>
 
-    <div class="actions">
-      <button id="copyBtn">📋 Copy Payment Schedule</button>
-    </div>
+        <div class="actions">
+            <button id="copyBtn">📋 Copy Payment Schedule</button>
+          </div>
+     
   </div>
-  <div>
-    <img src="image/ph price1.jpg" alt="">
-    <img src="image/ph price 2.jpg" alt="">
-    <img src="image/ph price 3.jpg" alt="">
-    <img src="image/iphone 17 (2).jpg" alt="">
-    <img src="image/discount.jpg" alt="">
+    <div>
+        <img src="image/i pad and tablet.jpg" alt="">
+        <img src="image/i phone.jpg" alt="">
+        <img src="image/pad pro 11 and 13.jpg" alt="">
+        <img src="image/samsuang.jpg" alt="">
+        <img src="image/watch and accessories.jpg" alt="">
+        <img src="image/discount.jpg" alt="">
 
-  </div>
+      </div>
 
+   
   <script>
     // --- Configuration ---
     const VISA_RULES = {
@@ -136,11 +311,18 @@
     const sumShownEl = el('sumShown');
     const copyBtn = el('copyBtn');
 
-    let lastPayments = [];      // numbers of each payment
-    let lastPlanLabel = "";     // "3 months", "olo3 (50/25/25)", etc.
+    // --- NEW Note Elements ---
+    const noteInp = el('noteInput');
+    const saveNoteBtn = el('saveNoteBtn');
+    const clearNoteBtn = el('clearNoteBtn');
+    const noteDisplay = el('noteDisplay');
+    // --- END NEW ---
+
+    let lastPayments = [];      // numbers of each payment
+    let lastPlanLabel = "";     // "3 months", "olo3 (50/25/25)", etc.
 
     function optionLabel(m) {
-      if (typeof m === 'number' && Number.isFinite(m)) return `${m} month${m>1?'s':''}`;
+      if (typeof m === 'number' && Number.isFinite(m)) return `${m} month${m > 1 ? 's' : ''}`;
       if (m === 'olo3') return 'olo3 (50/25/25)';
       return String(m); // show raw text for notes
     }
@@ -179,7 +361,7 @@
     ];
 
     function calcAndRender() {
-      const selValue = monthsSel.value;                         // "3" | "4" | "5" | "olo3" | "to confirm to office"
+      const selValue = monthsSel.value;                         // "3" | "4" | "5" | "olo3" | "to confirm to office"
       const price = Number(priceInp.value || 0);
       const discount = Math.max(0, Number(discountInp.value || 0));
 
@@ -251,7 +433,7 @@
         const tr = document.createElement('tr');
         const tdL = document.createElement('td');
         const tdR = document.createElement('td');
-        tdL.textContent = `${i===0 ? 'First' : i===1 ? 'Second' : i===2 ? 'Third' : (i+1)+'th'} payment`;
+        tdL.textContent = `${i === 0 ? 'First' : i === 1 ? 'Second' : i === 2 ? 'Third' : (i + 1) + 'th'} payment`;
         tdR.textContent = fmt.format(amt);
         tr.appendChild(tdL); tr.appendChild(tdR);
         scheduleBody.appendChild(tr);
@@ -260,19 +442,45 @@
       scheduleTbl.style.display = '';
     }
 
+    // --- NEW Note Functions ---
+    function saveNote() {
+      const noteText = noteInp.value.trim();
+      if (noteText) {
+        noteDisplay.textContent = noteText;
+        noteDisplay.classList.add('visible');
+      } else {
+        clearNote(); // If they save an empty string, clear it
+      }
+    }
+
+    function clearNote() {
+      noteInp.value = '';
+      noteDisplay.textContent = '';
+      noteDisplay.classList.remove('visible');
+    }
+    // --- END NEW ---
+
     function copySchedule() {
       if (!lastPayments.length) {
         alert("ရွေးချယ်ပြီးတွက်ပြီးမှ ကော်ပီလုပ်နိုင်ပါတယ်။");
         return;
       }
-      let text = `---- ${lastPlanLabel} အတွက်ဆိုရင်တော့\n`;
+
+      // --- MODIFIED to include note ---
+      let noteText = "";
+      if (noteDisplay.classList.contains('visible') && noteDisplay.textContent) {
+        noteText = `*** Note: ${noteDisplay.textContent.trim()} ***\n\n`;
+      }
+
+      let text = `${noteText}---- ${lastPlanLabel} အတွက်ဆိုရင်တော့\n`; // Note is added here
       lastPayments.forEach((amt, i) => {
-        const label = burmeseLabels[i] || `${i+1} လအတွက်က`;
+        const label = burmeseLabels[i] || `${i + 1} လအတွက်က`;
         text += `${label} ${fmt.format(amt)} w\n`;
       });
       navigator.clipboard.writeText(text)
-        .then(() => alert("✅ Payment schedule copied!"))
+        .then(() => alert("✅ Payment schedule (and note) copied!")) // Updated alert
         .catch(() => alert("Copy failed—please allow clipboard permissions."));
+      // --- END MODIFICATION ---
     }
 
     // Events
@@ -282,9 +490,15 @@
     discountInp.addEventListener('input', calcAndRender);
     copyBtn.addEventListener('click', copySchedule);
 
+    // --- NEW Note Events ---
+    saveNoteBtn.addEventListener('click', saveNote);
+    clearNoteBtn.addEventListener('click', clearNote);
+    // --- END NEW ---
+
     // Init
     populateMonths();
     calcAndRender();
   </script>
 </body>
+
 </html>
