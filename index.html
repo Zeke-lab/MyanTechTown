@@ -12,6 +12,7 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
 
+
   <!-- Load Google Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -213,7 +214,7 @@
 
 
   <!-- Your Images (Hidden for now, as they are not on the server) -->
-  <div class="grid grid-cols-2 md:grid-cols-3 gap-4 my-6">
+  <div class="hidden">
     <img src="image/i pad and tablet.jpg" alt="">
     <img src="image/i phone.jpg" alt="">
     <img src="image/pad pro 11 and 13.jpg" alt="">
@@ -223,304 +224,281 @@
   </div>
 
 
-  <script>
-    // --- JAVASCRIPT IS 100% CLEANED AND FIXED ---
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // --- Configuration ---
-    const VISA_RULES = {
-      Visa1: [2, 3, 4, 5],
-      Visa2: [2, 3, "olo3"],
-      Visa3: ["4 (if >4month)", "olo3"],
-      Visa4: [2, 3, 4],
-      Visa5: ["to confirm to office"],
-      Visa6: ["4 (if >4month)", "olo3"],
-      Visa7: ["olo3"]
-    };
+  // ======== YOUR FIREBASE CONFIG HERE ========
+  const firebaseConfig = {
+  apiKey: "AIzaSyB7uuCxNFEVTCmLiRHjAcgh4fGYsliVzu0",
+  authDomain: "myan-tech-town-notes.firebaseapp.com",
+  projectId: "myan-tech-town-notes",
+  storageBucket: "myan-tech-town-notes.firebasestorage.app",
+  messagingSenderId: "42200470955",
+  appId: "1:42200470955:web:c4d14569a91d3aab842eee"
+};
+  // ============================================
 
-    // Month-based multiplier
-    function multiplierForMonths(months) {
-      if (months === 5) return 1.15;
-      if (months === 3 || months === 4) return 1.10;
-      return 1.00; // fallback for 2 or others
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // --- Elements & helpers (keep your existing ones) ---
+  const fmt = new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 });
+  const el = (id) => document.getElementById(id);
+  const visaSel = el('visa');
+  const monthsSel = el('months');
+  const priceInp = el('price');
+  const discountInp = el('discount');
+  const totalEl = el('total');
+  const monthlyEl = el('monthly');
+  const scheduleTbl = el('schedule');
+  const scheduleBody = scheduleTbl.querySelector('tbody');
+  const sumShownEl = el('sumShown');
+  const copyBtn = el('copyBtn');
+
+  const noteInp = el('noteInput');
+  const saveNoteBtn = el('saveNoteBtn');
+  const clearNoteBtn = el('clearNoteBtn');
+  const noteDisplay = el('noteDisplay');
+
+  // --- Your existing config & functions (calculator) ---
+  const VISA_RULES = {
+    Visa1: [2, 3, 4, 5],
+    Visa2: [2, 3, "olo3"],
+    Visa3: ["4 (if >4month)", "olo3"],
+    Visa4: [2, 3, 4],
+    Visa5: ["to confirm to office"],
+    Visa6: ["4 (if >4month)", "olo3"],
+    Visa7: ["olo3"]
+  };
+  function multiplierForMonths(months) {
+    if (months === 5) return 1.15;
+    if (months === 3 || months === 4) return 1.10;
+    return 1.00;
+  }
+  function optionLabel(m) {
+    if (typeof m === 'number' && Number.isFinite(m)) return `${m} month${m > 1 ? 's' : ''}`;
+    if (m === 'olo3') return 'olo3 (50/25/25)';
+    return String(m);
+  }
+  function populateMonths() {
+    const v = visaSel.value;
+    monthsSel.innerHTML = '';
+    const allowed = VISA_RULES[v] || [];
+    if (!allowed.length) {
+      monthsSel.disabled = true;
+      monthsSel.innerHTML = '<option value="">Select plan…</option>';
+      return;
     }
-
-    // --- Elements & helpers ---
-    const fmt = new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 });
-    const el = (id) => document.getElementById(id);
-    const visaSel = el('visa');
-    const monthsSel = el('months');
-    const priceInp = el('price');
-    const discountInp = el('discount');
-    const totalEl = el('total');
-    const monthlyEl = el('monthly');
-    const scheduleTbl = el('schedule');
-    const scheduleBody = scheduleTbl.querySelector('tbody');
-    const sumShownEl = el('sumShown');
-    const copyBtn = el('copyBtn');
-
-    const noteInp = el('noteInput');
-    const saveNoteBtn = el('saveNoteBtn');
-    const clearNoteBtn = el('clearNoteBtn');
-    const noteDisplay = el('noteDisplay');
-
-    // --- *** NEW: Note State Management *** ---
-    let savedNotes = JSON.parse(localStorage.getItem('phoneCalcNotes')) || [];
-
-    let lastPayments = [];
-    let lastPlanLabel = "";
-
-    // --- *** NEW: Function to save notes to localStorage *** ---
-    function updateLocalStorage() {
-      localStorage.setItem('phoneCalcNotes', JSON.stringify(savedNotes));
-    }
-
-    // --- *** NEW: Function to render all notes *** ---
-    function renderNotes() {
-      noteDisplay.innerHTML = ''; // Clear existing notes
-      if (savedNotes.length === 0) {
-        noteDisplay.style.display = 'none'; // Hide container if empty
-        return;
-      }
-
-      noteDisplay.style.display = 'block'; // Show container
-
-      savedNotes.forEach(note => {
-        const noteEl = document.createElement('div');
-        noteEl.className = 'note-item flex items-center justify-between p-3 bg-yellow-50 rounded-lg';
-
-        const textEl = document.createElement('span');
-        textEl.className = 'text-sm text-yellow-900';
-        textEl.textContent = note.text;
-
-        const deleteBtn = document.createElement('button');
-        deleteBtn.className = 'delete-note-btn ml-3 p-1 text-red-500 hover:text-red-700 rounded-full hover:bg-red-100 transition-colors';
-        deleteBtn.dataset.noteId = note.id; // Set ID for deletion
-        deleteBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>`;
-
-        noteEl.appendChild(textEl);
-        noteEl.appendChild(deleteBtn);
-        noteDisplay.appendChild(noteEl);
-      });
-    }
-
-    // --- *** NEW: Function to handle clicking delete on a note *** ---
-    function handleDeleteNote(event) {
-      // Use .closest to find the button
-      const deleteButton = event.target.closest('.delete-note-btn');
-      if (deleteButton) {
-        const idToDelete = Number(deleteButton.dataset.noteId);
-        savedNotes = savedNotes.filter(note => note.id !== idToDelete);
-        updateLocalStorage();
-        renderNotes();
-      }
-    }
-    // --- *** END NEW FUNCTIONS *** ---
-
-    function optionLabel(m) {
-      if (typeof m === 'number' && Number.isFinite(m)) return `${m} month${m > 1 ? 's' : ''}`;
-      if (m === 'olo3') return 'olo3 (50/25/25)';
-      return String(m);
-    }
-
-    function populateMonths() {
-      const v = visaSel.value;
-      monthsSel.innerHTML = '';
-      const allowed = VISA_RULES[v] || [];
-
-      if (!allowed.length) {
-        monthsSel.disabled = true;
-        monthsSel.innerHTML = '<option value="">Select plan…</option>';
-        return;
-      }
-
-      monthsSel.disabled = false;
-      const ph = document.createElement('option');
-      ph.value = '';
-      ph.textContent = 'Select plan…';
-      ph.disabled = true;
-      ph.selected = true;
-      monthsSel.appendChild(ph);
-
-      allowed.forEach(m => {
-        const opt = document.createElement('option');
-        opt.value = String(m);
-        opt.textContent = optionLabel(m);
-        monthsSel.appendChild(opt);
-      });
-    }
-
-    const burmeseLabels = [
-      "ပထမလအတွက်က", "ဒုတိယလအတွက်က", "တတိယလအတွက်က", "စတုတ္ထလအတွက်က", "ပဉ္စမလအတွက်က",
-      "ဆဌမလအတွက်က", "သတ္တမလအတွက်က", "အဠမလအတွက်က", "နဝမလအတွက်က", "ဒသမလအတွက်က",
-      "ဧကဒသမလအတွက်က", "ဒွဒသမလအတွက်က"
-    ];
-
-    function calcAndRender() {
-      const selValue = monthsSel.value;
-      const price = Number(priceInp.value || 0);
-      const discount = Math.max(0, Number(discountInp.value || 0));
-
-      if (!selValue || !isFinite(price) || price <= 0) {
-        totalEl.textContent = '–';
-        monthlyEl.textContent = '–';
-        scheduleTbl.style.display = 'none';
-        scheduleBody.innerHTML = '';
-        sumShownEl.textContent = '–';
-        lastPayments = [];
-        lastPlanLabel = '';
-        return;
-      }
-
-      let payments = [];
-      let total = 0;
-
-      if (selValue === "olo3") {
-        const months = 3;
-        const k = multiplierForMonths(months);
-        total = price * k;
-
-        payments = [
-          total * 0.50,
-          Math.max(0, total * 0.25 - discount),
-          total * 0.25
-        ];
-
-        totalEl.textContent = fmt.format(total);
-        monthlyEl.textContent = "Varies";
-      } else if (/^\d+$/.test(selValue)) {
-        const months = parseInt(selValue, 10);
-        const k = multiplierForMonths(months);
-        total = price * k;
-        const monthly = total / months;
-
-        for (let i = 1; i <= months; i++) {
-          let amt = monthly;
-          if (i === 2) amt = Math.max(0, monthly - discount);
-          payments.push(amt);
-        }
-
-        totalEl.textContent = fmt.format(total);
-        monthlyEl.textContent = fmt.format(monthly);
-      } else {
-        totalEl.textContent = '–';
-        monthlyEl.textContent = selValue;
-        scheduleTbl.style.display = 'none';
-        scheduleBody.innerHTML = '';
-        sumShownEl.textContent = '–';
-        lastPayments = [];
-        lastPlanLabel = selValue;
-        return;
-      }
-
-      lastPayments = payments.slice();
-      lastPlanLabel = monthsSel.options[monthsSel.selectedIndex]?.textContent || "";
-
+    monthsSel.disabled = false;
+    const ph = document.createElement('option');
+    ph.value = '';
+    ph.textContent = 'Select plan…';
+    ph.disabled = true;
+    ph.selected = true;
+    monthsSel.appendChild(ph);
+    allowed.forEach(m => {
+      const opt = document.createElement('option');
+      opt.value = String(m);
+      opt.textContent = optionLabel(m);
+      monthsSel.appendChild(opt);
+    });
+  }
+  const burmeseLabels = [
+    "ပထမလအတွက်က", "ဒုတိယလအတွက်က", "တတိယလအတွက်က", "စတုတ္ထလအတွက်က", "ပဉ္စမလအတွက်က",
+    "ဆဌမလအတွက်က", "သတ္တမလအတွက်က", "အဠမလအတွက်က", "နဝမလအတွက်က", "ဒသမလအတွက်က",
+    "ဧကဒသမလအတွက်က", "ဒွဒသမလအတွက်က"
+  ];
+  let lastPayments = [];
+  let lastPlanLabel = "";
+  function calcAndRender() {
+    const selValue = monthsSel.value;
+    const price = Number(priceInp.value || 0);
+    const discount = Math.max(0, Number(discountInp.value || 0));
+    if (!selValue || !isFinite(price) || price <= 0) {
+      totalEl.textContent = '–';
+      monthlyEl.textContent = '–';
+      scheduleTbl.style.display = 'none';
       scheduleBody.innerHTML = '';
-      let sum = 0;
-      payments.forEach((amt, i) => {
-        sum += amt;
-        const tr = document.createElement('tr');
-        tr.className = 'hover:bg-gray-50';
-        const tdL = document.createElement('td');
-        const tdR = document.createElement('td');
-        tdL.className = 'px-4 py-3';
-        tdR.className = 'px-4 py-3 text-right font-medium text-gray-900';
-        tdL.textContent = `${i === 0 ? 'First' : i === 1 ? 'Second' : i === 2 ? 'Third' : (i + 1) + 'th'} payment`;
-        tdR.textContent = fmt.format(amt);
-        tr.appendChild(tdL);
-        tr.appendChild(tdR);
-        scheduleBody.appendChild(tr);
+      sumShownEl.textContent = '–';
+      lastPayments = [];
+      lastPlanLabel = '';
+      return;
+    }
+    let payments = [];
+    let total = 0;
+    if (selValue === "olo3") {
+      const months = 3;
+      const k = multiplierForMonths(months);
+      total = price * k;
+      payments = [
+        total * 0.50,
+        Math.max(0, total * 0.25 - discount),
+        total * 0.25
+      ];
+      totalEl.textContent = fmt.format(total);
+      monthlyEl.textContent = "Varies";
+    } else if (/^\d+$/.test(selValue)) {
+      const months = parseInt(selValue, 10);
+      const k = multiplierForMonths(months);
+      total = price * k;
+      const monthly = total / months;
+      for (let i = 1; i <= months; i++) {
+        let amt = monthly;
+        if (i === 2) amt = Math.max(0, monthly - discount);
+        payments.push(amt);
+      }
+      totalEl.textContent = fmt.format(total);
+      monthlyEl.textContent = fmt.format(monthly);
+    } else {
+      totalEl.textContent = '–';
+      monthlyEl.textContent = selValue;
+      scheduleTbl.style.display = 'none';
+      scheduleBody.innerHTML = '';
+      sumShownEl.textContent = '–';
+      lastPayments = [];
+      lastPlanLabel = selValue;
+      return;
+    }
+    lastPayments = payments.slice();
+    lastPlanLabel = monthsSel.options[monthsSel.selectedIndex]?.textContent || "";
+    scheduleBody.innerHTML = '';
+    let sum = 0;
+    payments.forEach((amt, i) => {
+      sum += amt;
+      const tr = document.createElement('tr');
+      tr.className = 'hover:bg-gray-50';
+      const tdL = document.createElement('td');
+      const tdR = document.createElement('td');
+      tdL.className = 'px-4 py-3';
+      tdR.className = 'px-4 py-3 text-right font-medium text-gray-900';
+      tdL.textContent = `${i === 0 ? 'First' : i === 1 ? 'Second' : i === 2 ? 'Third' : (i + 1) + 'th'} payment`;
+      tdR.textContent = fmt.format(amt);
+      tr.appendChild(tdL);
+      tr.appendChild(tdR);
+      scheduleBody.appendChild(tr);
+    });
+    sumShownEl.textContent = fmt.format(sum);
+    scheduleTbl.style.display = 'table';
+  }
+
+  // ===== Firestore-backed notes (replace LocalStorage) =====
+  let savedNotes = [];
+
+  function renderNotes() {
+    noteDisplay.innerHTML = '';
+    if (savedNotes.length === 0) {
+      noteDisplay.style.display = 'none';
+      return;
+    }
+    noteDisplay.style.display = 'block';
+    savedNotes.forEach(note => {
+      const noteEl = document.createElement('div');
+      noteEl.className = 'note-item flex items-center justify-between p-3 bg-yellow-50 rounded-lg';
+      const textEl = document.createElement('span');
+      textEl.className = 'text-sm text-yellow-900';
+      textEl.textContent = note.text;
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'delete-note-btn ml-3 p-1 text-red-500 hover:text-red-700 rounded-full hover:bg-red-100 transition-colors';
+      deleteBtn.dataset.noteId = note.id;
+      deleteBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>`;
+      noteEl.appendChild(textEl);
+      noteEl.appendChild(deleteBtn);
+      noteDisplay.appendChild(noteEl);
+    });
+  }
+
+  async function loadNotes() {
+    const qs = await getDocs(collection(db, "notes"));
+    savedNotes = qs.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderNotes();
+  }
+
+  async function saveNote() {
+    const noteText = noteInp.value.trim();
+    if (!noteText) return;
+    await addDoc(collection(db, "notes"), { text: noteText });
+    noteInp.value = '';
+    await loadNotes();
+  }
+
+  async function deleteNoteById(id) {
+    await deleteDoc(doc(db, "notes", id));
+    await loadNotes();
+  }
+
+  async function clearAllNotes() {
+    const qs = await getDocs(collection(db, "notes"));
+    await Promise.all(qs.docs.map(d => deleteDoc(doc(db, "notes", d.id))));
+    await loadNotes();
+  }
+
+  function copySchedule() {
+    if (!lastPayments.length) {
+      alert("ရွေးချယ်ပြီးတွက်ပြီးမှ ကော်ပီလုပ်နိုင်ပါတယ်။");
+      return;
+    }
+    let noteText = "";
+    if (savedNotes.length > 0) {
+      noteText = "*** Notes ***\n";
+      savedNotes.forEach(note => {
+        noteText += `- ${note.text}\n`;
       });
-      sumShownEl.textContent = fmt.format(sum);
-      scheduleTbl.style.display = 'table'; // Use 'table' instead of ''
+      noteText += "\n";
     }
-
-    // --- *** MODIFIED: Renamed function *** ---
-    function saveNote() {
-      const noteText = noteInp.value.trim();
-      if (noteText) {
-        savedNotes.push({ id: Date.now(), text: noteText });
-        updateLocalStorage();
-        renderNotes();
-        noteInp.value = ''; // Clear input after saving
-      }
+    let text = `${noteText}---- ${lastPlanLabel} အတွက်ဆိုရင်တော့\n`;
+    lastPayments.forEach((amt, i) => {
+      const label = burmeseLabels[i] || `${i + 1} လအတွက်က`;
+      text += `${label} ${fmt.format(amt)} w\n`;
+    });
+    try {
+      navigator.clipboard.writeText(text)
+        .then(() => alert("✅ Payment schedule (and note) copied!"))
+        .catch(() => copyFallback(text));
+    } catch {
+      copyFallback(text);
     }
-
-    // --- *** MODIFIED: Renamed function *** ---
-    function clearAllNotes() {
-      savedNotes = [];
-      updateLocalStorage();
-      renderNotes();
+  }
+  function copyFallback(text) {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.position = "fixed";
+    textArea.style.top = "0";
+    textArea.style.left = "0";
+    textArea.style.opacity = "0";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+      document.execCommand('copy');
+      alert("✅ Payment schedule (and note) copied!");
+    } catch {
+      alert("Copy failed. Please copy the text manually.");
     }
+    document.body.removeChild(textArea);
+  }
 
-    function copySchedule() {
-      if (!lastPayments.length) {
-        alert("ရွေးချယ်ပြီးတွက်ပြီးမှ ကော်ပီလုပ်နိုင်ပါတယ်။");
-        return;
-      }
+  // --- Events ---
+  visaSel.addEventListener('change', () => { populateMonths(); calcAndRender(); });
+  monthsSel.addEventListener('change', calcAndRender);
+  priceInp.addEventListener('input', calcAndRender);
+  discountInp.addEventListener('input', calcAndRender);
+  copyBtn.addEventListener('click', copySchedule);
+  saveNoteBtn.addEventListener('click', saveNote);
+  clearNoteBtn.addEventListener('click', clearAllNotes);
+  noteDisplay.addEventListener('click', (e) => {
+    const btn = e.target.closest('.delete-note-btn');
+    if (btn) deleteNoteById(btn.dataset.noteId);
+  });
 
-      // --- *** MODIFIED: Copies all notes *** ---
-      let noteText = "";
-      if (savedNotes.length > 0) {
-        noteText = "*** Notes ***\n";
-        savedNotes.forEach(note => {
-          noteText += `- ${note.text}\n`;
-        });
-        noteText += "\n";
-      }
+  // --- Initial Load ---
+  populateMonths();
+  calcAndRender();
+  loadNotes(); // <-- Firestore, not localStorage
+</script>
 
-      let text = `${noteText}---- ${lastPlanLabel} အတွက်ဆိုရင်တော့\n`;
-      lastPayments.forEach((amt, i) => {
-        const label = burmeseLabels[i] || `${i + 1} လအတွက်က`;
-        text += `${label} ${fmt.format(amt)} w\n`;
-      });
 
-      // Fallback for clipboard
-      try {
-        navigator.clipboard.writeText(text)
-          .then(() => alert("✅ Payment schedule (and note) copied!"))
-          .catch(() => copyFallback(text)); // Use fallback on fail
-      } catch (err) {
-        copyFallback(text);
-      }
-    }
-
-    // Fallback copy method for older browsers or restricted environments
-    function copyFallback(text) {
-      const textArea = document.createElement("textarea");
-      textArea.value = text;
-      textArea.style.position = "fixed";  // Avoid scrolling to bottom
-      textArea.style.top = "0";
-      textArea.style.left = "0";
-      textArea.style.opacity = "0";
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
-      try {
-        document.execCommand('copy');
-        alert("✅ Payment schedule (and note) copied!");
-      } catch (err) {
-        alert("Copy failed. Please copy the text manually.");
-      }
-      document.body.removeChild(textArea);
-    }
-
-    // --- Event Listeners ---
-    visaSel.addEventListener('change', () => { populateMonths(); calcAndRender(); });
-    monthsSel.addEventListener('change', calcAndRender);
-    priceInp.addEventListener('input', calcAndRender);
-    discountInp.addEventListener('input', calcAndRender);
-    copyBtn.addEventListener('click', copySchedule);
-    // --- *** MODIFIED: Listeners updated *** ---
-    saveNoteBtn.addEventListener('click', saveNote);
-    clearNoteBtn.addEventListener('click', clearAllNotes);
-    noteDisplay.addEventListener('click', handleDeleteNote); // Listener for delete buttons
-
-    // --- Initial Load ---
-    populateMonths();
-    calcAndRender();
-    renderNotes(); // --- *** NEW: Load saved notes on page load *** ---
-  </script>
 </body>
 
 </html>
