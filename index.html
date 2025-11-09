@@ -2,14 +2,14 @@
 <html lang="en">
 
 <head>
-   
+
   <meta charset="utf-8" />
-   
+
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Phone Installment Calculator</title>
+  <title>Phone Installment Calculator</title>
 
   <!-- Load Tailwind CSS -->
-   
+
   <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- Load Google Font -->
@@ -17,7 +17,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <style>
+  <style>
     /* Use Inter font */
     body {
       font-family: 'Inter', system-ui, Arial, sans-serif;
@@ -74,10 +74,10 @@
     <!-- ============================================== -->
     <!--    CARD 1: CALCULATOR (Must come FIRST)      -->
     <!-- ============================================== -->
-      <div class="lg:col-span-2 bg-white rounded-2xl shadow-lg p-6 md:p-8">
+    <div class="lg:col-span-2 bg-white rounded-2xl shadow-lg p-6 md:p-8">
 
       <!-- Header -->
-          <div class="mb-6">
+      <div class="mb-6">
         <h1 class="text-2xl font-bold text-gray-900">Phone Installment Calculator</h1>
         <p class="mt-1 text-xs font-medium text-indigo-700 pill inline-block px-2 py-0.5 rounded-full">
           3/4 → ×1.10 • 5 → ×1.15 • olo3 → ×1.10 then 50/25/25
@@ -85,97 +85,97 @@
       </div>
 
       <!-- Input Grid -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-             
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
         <!-- Visa Type -->
         <div class="space-y-2">
-                  <label for="visa" class="text-sm font-medium text-gray-700">Visa type</label>
-                  <select id="visa"
+          <label for="visa" class="text-sm font-medium text-gray-700">Visa type</label>
+          <select id="visa"
             class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                      <option value="" selected>Select Visa type…</option>
-                      <option value="Visa1">E9,D2,F2,E7</option>
-                      <option value="Visa2">F6</option>
-                      <option value="Visa3">D4</option>
-                      <option value="Visa4">A1</option>
-                      <option value="Visa5">F</option>
-                      <option value="Visa6">G1</option>
-                      <option value="Visa7">O,E10</option>
-                    </select>
-                  <div class="text-xs text-gray-500">Choose card group; it controls which plans are allowed.</div>
-                  <div class="text-xs text-gray-500">သတ်တမ်းနည်းပြီး အရစ်ကျလ ပိုလိုချင်ရင် ရုံးကိုမေး</div>
-                </div>
+            <option value="" selected>Select Visa type…</option>
+            <option value="Visa1">E9,D2,F2,E7</option>
+            <option value="Visa2">F6</option>
+            <option value="Visa3">D4</option>
+            <option value="Visa4">A1</option>
+            <option value="Visa5">F</option>
+            <option value="Visa6">G1</option>
+            <option value="Visa7">O,E10</option>
+          </select>
+          <div class="text-xs text-gray-500">Choose card group; it controls which plans are allowed.</div>
+          <div class="text-xs text-gray-500">သတ်တမ်းနည်းပြီး အရစ်ကျလ ပိုလိုချင်ရင် ရုံးကိုမေး</div>
+        </div>
 
         <!-- Installment Plan -->
-              <div class="space-y-2">
-                  <label for="months" class="text-sm font-medium text-gray-700">Installment plan</label>
-                  <select id="months" disabled
+        <div class="space-y-2">
+          <label for="months" class="text-sm font-medium text-gray-700">Installment plan</label>
+          <select id="months" disabled
             class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:bg-gray-50">
-                      <option value="">Select plan…</option>
-                    </select>
-                  <div class="text-xs text-gray-500">Options depend on Visa type (supports numbers & "olo3").</div>
-                </div>
+            <option value="">Select plan…</option>
+          </select>
+          <div class="text-xs text-gray-500">Options depend on Visa type (supports numbers & "olo3").</div>
+        </div>
 
         <!-- Phone Price -->
-              <div class="space-y-2">
-                  <label for="price" class="text-sm font-medium text-gray-700">Phone price</label>
-                  <input id="price" type="number" min="0" step="1" placeholder="e.g., 35990"
+        <div class="space-y-2">
+          <label for="price" class="text-sm font-medium text-gray-700">Phone price</label>
+          <input id="price" type="number" min="0" step="1" placeholder="e.g., 35990"
             class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
-                  <div class="text-xs text-gray-500">Multiplier by plan: 3/4 → ×1.10, 5 → ×1.15.</div>
-                </div>
+          <div class="text-xs text-gray-500">Multiplier by plan: 3/4 → ×1.10, 5 → ×1.15.</div>
+        </div>
 
         <!-- Discount -->
-              <div class="space-y-2">
-                  <label for="discount" class="text-sm font-medium text-gray-700">Second-month discount</label>
-                  <input id="discount" type="number" min="0" step="1" value="0"
+        <div class="space-y-2">
+          <label for="discount" class="text-sm font-medium text-gray-700">Second-month discount</label>
+          <input id="discount" type="number" min="0" step="1" value="0"
             class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
-                  <div class="text-xs text-gray-500">This amount is subtracted from the 2nd payment only.</div>
-                </div>
-           
+          <div class="text-xs text-gray-500">This amount is subtracted from the 2nd payment only.</div>
+        </div>
+
       </div>
 
       <!-- Summary Box -->
-          <div class="mt-8 bg-indigo-50 border-l-4 border-indigo-500 rounded-r-lg p-5">
-              <div class="flex items-center justify-between">
+      <div class="mt-8 bg-indigo-50 border-l-4 border-indigo-500 rounded-r-lg p-5">
+        <div class="flex items-center justify-between">
           <span class="text-sm font-medium text-indigo-800">Total (after multiplier):</span>
           <span id="total" class="text-lg font-bold text-indigo-900">–</span>
         </div>
-              <div class="flex items-center justify-between mt-2">
+        <div class="flex items-center justify-between mt-2">
           <span class="text-sm font-medium text-indigo-800">Monthly payment:</span>
           <span id="monthly" class="text-lg font-bold text-indigo-900">–</span>
         </div>
-              <p class="text-xs text-indigo-700 mt-3">For equal plans: Monthly = Total ÷ Months. For olo3: 50% / 25% /
+        <p class="text-xs text-indigo-700 mt-3">For equal plans: Monthly = Total ÷ Months. For olo3: 50% / 25% /
           25% of Total.</p>
-            </div>
+      </div>
 
       <!-- Payment Schedule Table -->
-          <table id="schedule" class="w-full mt-6 text-sm text-left" style="display:none">
-              <thead class="bg-gray-50 text-xs text-gray-700 uppercase">
-                  <tr>
-                      <th class="px-4 py-3">Payment</th>
-                      <th class="px-4 py-3 text-right">Amount</th>
-                    </tr>
-                </thead>
-              <tbody class="divide-y divide-gray-200"></tbody>
-              <tfoot class="border-t-2 border-gray-300 font-semibold">
-                  <tr>
-                      <td class="px-4 py-3 text-gray-900">Total of payments shown</td>
-                      <td id="sumShown" class="px-4 py-3 text-right text-gray-900">–</td>
-                    </tr>
-                </tfoot>
-            </table>
+      <table id="schedule" class="w-full mt-6 text-sm text-left" style="display:none">
+        <thead class="bg-gray-50 text-xs text-gray-700 uppercase">
+          <tr>
+            <th class="px-4 py-3">Payment</th>
+            <th class="px-4 py-3 text-right">Amount</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200"></tbody>
+        <tfoot class="border-t-2 border-gray-300 font-semibold">
+          <tr>
+            <td class="px-4 py-3 text-gray-900">Total of payments shown</td>
+            <td id="sumShown" class="px-4 py-3 text-right text-gray-900">–</td>
+          </tr>
+        </tfoot>
+      </table>
 
       <!-- Copy Button -->
-          <div class="mt-8">
-              <button id="copyBtn"
-            class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 text-white text-sm font-medium rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all">
+      <div class="mt-8">
+        <button id="copyBtn"
+          class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 text-white text-sm font-medium rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
             <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
             <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
           </svg>
           Copy Payment Schedule
         </button>
-            </div>
-       
+      </div>
+
     </div> <!-- End Card 1 -->
 
 
@@ -213,16 +213,16 @@
 
 
   <!-- Your Images (Hidden for now, as they are not on the server) -->
-    <div class="hidden">
-        <img src="image/i pad and tablet.jpg" alt="">
-        <img src="image/i phone.jpg" alt="">
-        <img src="image/pad pro 11 and 13.jpg" alt="">
-        <img src="image/samsuang.jpg" alt="">
-        <img src="image/watch and accessories.jpg" alt="">
-        <img src="image/discount.jpg" alt="">
-      </div>
+  <div class="grid grid-cols-2 md:grid-cols-3 gap-4 my-6">
+    <img src="image/i pad and tablet.jpg" alt="">
+    <img src="image/i phone.jpg" alt="">
+    <img src="image/pad pro 11 and 13.jpg" alt="">
+    <img src="image/samsuang.jpg" alt="">
+    <img src="image/watch and accessories.jpg" alt="">
+    <img src="image/discount.jpg" alt="">
+  </div>
 
-   
+
   <script>
     // --- JAVASCRIPT IS 100% CLEANED AND FIXED ---
 
