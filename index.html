@@ -2,283 +2,230 @@
 <html lang="en">
 
 <head>
-   
+   
   <meta charset="utf-8" />
-   
+   
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Phone Installment Calculator</title>
-    <style>
-    :root {
-      font-family: system-ui, Arial, sans-serif;
-    }
+    <title>Phone Installment Calculator</title>
 
+  <!-- Load Tailwind CSS -->
+   
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Load Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+    /* Use Inter font */
     body {
-      margin: 0;
-      padding: 24px;
-      background: #f7f8fb;
+      font-family: 'Inter', system-ui, Arial, sans-serif;
+      background-color: #f3f4f6;
+      /* Light gray background */
     }
 
-    .card {
-      max-width: 760px;
-      margin: 0 auto;
-      background: #fff;
-      border-radius: 16px;
-      padding: 20px 22px;
-      box-shadow: 0 8px 28px rgba(0, 0, 0, .06);
-    }
-
-    h1 {
-      font-size: 20px;
-      margin: 0 0 14px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
-    }
-
-    .row {
-      display: grid;
-      gap: 6px;
-    }
-
-    label {
-      font-size: 13px;
-      color: #344054;
-    }
-
-    select,
-    input {
-      padding: 10px 12px;
-      border: 1px solid #d6d9df;
-      border-radius: 10px;
-      font-size: 14px;
-      background: #fff;
-      outline: none;
-    }
-
-    select:focus,
-    input:focus {
-      border-color: #6aa6ff;
-      box-shadow: 0 0 0 3px rgba(106, 166, 255, .25);
-    }
-
-    .muted {
-      color: #667085;
-      font-size: 12px;
-    }
-
-    .summary {
-      margin-top: 16px;
-      background: #fafbff;
-      border: 1px dashed #d6d9df;
-      border-radius: 12px;
-      padding: 12px;
-    }
-
-    .summary p {
-      margin: 6px 0;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 12px;
-    }
-
-    th,
-    td {
-      text-align: right;
-      padding: 10px 8px;
-      border-bottom: 1px solid #eef0f4;
-      font-variant-numeric: tabular-nums;
-    }
-
-    th:first-child,
-    td:first-child {
-      text-align: left;
-    }
-
-    tfoot td {
-      font-weight: 600;
-    }
-
+    /* Custom style for the multiplier pill */
     .pill {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 999px;
-      font-size: 12px;
-      background: #eef2ff;
-      color: #3730a3;
-      margin-left: 6px;
+      background-color: #eef2ff;
+      color: #4338ca;
     }
 
-    .actions {
-      margin-top: 10px;
-      display: flex;
-      gap: 8px;
-    }
-
-    button {
-      padding: 10px 14px;
-      border-radius: 10px;
-      border: 1px solid #d6d9df;
-      background: #fff;
-      cursor: pointer;
-    }
-
-    button:hover {
-      border-color: #6aa6ff;
-      box-shadow: 0 0 0 3px rgba(106, 166, 255, .18);
-    }
-
-    /* --- NEW CSS FOR NOTE BOX --- */
-    .note-container {
-      margin-top: 16px;
-    }
-
-    .note-container .actions {
-      margin-top: 8px;
-      justify-content: flex-start;
-    }
-
-    #clearNoteBtn {
-      background: #fff9f9;
-      color: #d9534f;
-      border-color: #f3dede;
-    }
-
-    #clearNoteBtn:hover {
-      background: #fdf7f7;
-      border-color: #d9534f;
-    }
-
+    /* Custom style for note display */
     .note-display {
-      margin-top: 12px;
-      padding: 10px 14px;
-      background: #fffbeb;
-      /* Light yellow background */
+      background-color: #fefce8;
+      border-color: #fde68a;
+    }
+
+    /* Custom style for note item (new) */
+    .note-item {
+      background-color: #feffbb;
+      /* Lighter yellow for item - FIX: was feflbb */
       border: 1px solid #fde68a;
-      border-radius: 12px;
-      display: none;
-      /* starts hidden */
-      white-space: pre-wrap;
-      /* respects line breaks */
-      word-break: break-word;
-      font-size: 14px;
+      /* FIX: Added semicolon */
     }
 
-    .note-display.visible {
-      display: block;
+    /* Custom style for red clear button */
+    .btn-clear {
+      background-color: #fef2f2;
+      color: #dc2626;
+      border-color: #fee2e2;
     }
 
-    /* --- END NEW CSS --- */
+    .btn-clear:hover {
+      background-color: #fef2f2;
+      border-color: #dc2626;
+    }
 
-    @media (max-width: 760px) {
-      .grid {
-        grid-template-columns: 1fr;
-      }
+    /* Make delete icon non-clickable */
+    .delete-note-btn svg {
+      pointer-events: none;
     }
   </style>
 </head>
 
-<body>
-    <div class="card">
-        <h1>Phone Installment Calculator
-            <span class="pill">3/4 → ×1.10 • 5 → ×1.15 • olo3 → ×1.10 then 50/25/25</span>
-          </h1>
+<body class="p-4 md:p-8">
 
-        <div class="grid">
-            <div class="row">
-                <label for="visa">Visa type</label>
-                <select id="visa">
-                    <option value="" selected>Select Visa type…</option>
-                    <option value="Visa1">E9,D2,F2,E7</option>
-                    <option value="Visa2">F6</option>
-                    <option value="Visa3">D4</option>
-                    <option value="Visa4">A1</option>
-                    <option value="Visa5">F</option>
-                    <option value="Visa6">G1</option>
-                    <option value="Visa7">O,E10</option>
-                  </select>
-                <div class="muted">Choose card group; it controls which plans are allowed.</div>
-                <div class="muted">သတ်တမ်းနည်းပြီး အရစ်ကျလ ပိုလိုချင်ရင် ရုံးကိုမေး</div>
-              </div>
+  <!-- ============================================== -->
+  <!--    MAIN WRAPPER - CONTROLS THE 2 COLUMNS     -->
+  <!-- ============================================== -->
+  <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-start">
 
-            <div class="row">
-                <label for="months">Installment plan</label>
-                <select id="months" disabled>
-                    <option value="">Select plan…</option>
-                  </select>
-                <div class="muted">Options depend on Visa type (supports numbers & special plan "olo3").</div>
-              </div>
+    <!-- ============================================== -->
+    <!--    CARD 1: CALCULATOR (Must come FIRST)      -->
+    <!-- ============================================== -->
+      <div class="lg:col-span-2 bg-white rounded-2xl shadow-lg p-6 md:p-8">
 
-            <div class="row">
-                <label for="price">Phone price</label>
-                <input id="price" type="number" min="0" step="1" placeholder="e.g., 35990" />
-                <div class="muted">Multiplier by plan: 3/4 → ×1.10, 5 → ×1.15. olo3 uses ×1.10 then 50/25/25 split.
+      <!-- Header -->
+          <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-900">Phone Installment Calculator</h1>
+        <p class="mt-1 text-xs font-medium text-indigo-700 pill inline-block px-2 py-0.5 rounded-full">
+          3/4 → ×1.10 • 5 → ×1.15 • olo3 → ×1.10 then 50/25/25
+        </p>
+      </div>
+
+      <!-- Input Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+             
+        <!-- Visa Type -->
+        <div class="space-y-2">
+                  <label for="visa" class="text-sm font-medium text-gray-700">Visa type</label>
+                  <select id="visa"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                      <option value="" selected>Select Visa type…</option>
+                      <option value="Visa1">E9,D2,F2,E7</option>
+                      <option value="Visa2">F6</option>
+                      <option value="Visa3">D4</option>
+                      <option value="Visa4">A1</option>
+                      <option value="Visa5">F</option>
+                      <option value="Visa6">G1</option>
+                      <option value="Visa7">O,E10</option>
+                    </select>
+                  <div class="text-xs text-gray-500">Choose card group; it controls which plans are allowed.</div>
+                  <div class="text-xs text-gray-500">သတ်တမ်းနည်းပြီး အရစ်ကျလ ပိုလိုချင်ရင် ရုံးကိုမေး</div>
+                </div>
+
+        <!-- Installment Plan -->
+              <div class="space-y-2">
+                  <label for="months" class="text-sm font-medium text-gray-700">Installment plan</label>
+                  <select id="months" disabled
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:bg-gray-50">
+                      <option value="">Select plan…</option>
+                    </select>
+                  <div class="text-xs text-gray-500">Options depend on Visa type (supports numbers & "olo3").</div>
+                </div>
+
+        <!-- Phone Price -->
+              <div class="space-y-2">
+                  <label for="price" class="text-sm font-medium text-gray-700">Phone price</label>
+                  <input id="price" type="number" min="0" step="1" placeholder="e.g., 35990"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+                  <div class="text-xs text-gray-500">Multiplier by plan: 3/4 → ×1.10, 5 → ×1.15.</div>
+                </div>
+
+        <!-- Discount -->
+              <div class="space-y-2">
+                  <label for="discount" class="text-sm font-medium text-gray-700">Second-month discount</label>
+                  <input id="discount" type="number" min="0" step="1" value="0"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+                  <div class="text-xs text-gray-500">This amount is subtracted from the 2nd payment only.</div>
+                </div>
+           
+      </div>
+
+      <!-- Summary Box -->
+          <div class="mt-8 bg-indigo-50 border-l-4 border-indigo-500 rounded-r-lg p-5">
+              <div class="flex items-center justify-between">
+          <span class="text-sm font-medium text-indigo-800">Total (after multiplier):</span>
+          <span id="total" class="text-lg font-bold text-indigo-900">–</span>
         </div>
-              </div>
+              <div class="flex items-center justify-between mt-2">
+          <span class="text-sm font-medium text-indigo-800">Monthly payment:</span>
+          <span id="monthly" class="text-lg font-bold text-indigo-900">–</span>
+        </div>
+              <p class="text-xs text-indigo-700 mt-3">For equal plans: Monthly = Total ÷ Months. For olo3: 50% / 25% /
+          25% of Total.</p>
+            </div>
 
-            <div class="row">
-                <label for="discount">Second-month discount</label>
-                <input id="discount" type="number" min="0" step="1" value="0" />
-                <div class="muted">This amount is subtracted from the 2nd payment only (not below 0).</div>
-              </div>
-          </div>
+      <!-- Payment Schedule Table -->
+          <table id="schedule" class="w-full mt-6 text-sm text-left" style="display:none">
+              <thead class="bg-gray-50 text-xs text-gray-700 uppercase">
+                  <tr>
+                      <th class="px-4 py-3">Payment</th>
+                      <th class="px-4 py-3 text-right">Amount</th>
+                    </tr>
+                </thead>
+              <tbody class="divide-y divide-gray-200"></tbody>
+              <tfoot class="border-t-2 border-gray-300 font-semibold">
+                  <tr>
+                      <td class="px-4 py-3 text-gray-900">Total of payments shown</td>
+                      <td id="sumShown" class="px-4 py-3 text-right text-gray-900">–</td>
+                    </tr>
+                </tfoot>
+            </table>
 
-    <div class="note-container">
-      <div class="row">
-        <label for="noteInput">Note</label>
-        <input type="text" id="noteInput" placeholder="Add an optional note (e.g., customer name, special deal)...">
+      <!-- Copy Button -->
+          <div class="mt-8">
+              <button id="copyBtn"
+            class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-indigo-600 text-white text-sm font-medium rounded-lg shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
+            <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
+          </svg>
+          Copy Payment Schedule
+        </button>
+            </div>
+       
+    </div> <!-- End Card 1 -->
+
+
+    <!-- ============================================== -->
+    <!--    CARD 2: NOTE BOX (Must come SECOND)       -->
+    <!-- ============================================== -->
+    <div class="lg:col-span-1 bg-white rounded-2xl shadow-lg p-6 md:p-8 sticky top-8">
+      <h3 class="text-xl font-bold text-gray-900">Notes</h3>
+      <div class="space-y-2 mt-4">
+        <label for="noteInput" class="text-sm font-medium text-gray-700">Add a note</label>
+
+        <!-- Multi-line textarea for Burmese text -->
+        <textarea id="noteInput" rows="5" placeholder="Type your note here... (e.g., customer name, special deal)"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+
       </div>
-      <div class="actions">
-        <button id="saveNoteBtn">Save Note</button>
-        <button id="clearNoteBtn">Clear Note</button>
+      <div class="mt-4 flex gap-3">
+        <button id="saveNoteBtn"
+          class="flex-1 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all">Save
+          Note</button>
+        <!-- *** MODIFIED BUTTON TEXT *** -->
+        <button id="clearNoteBtn"
+          class="flex-1 px-4 py-2 border btn-clear text-sm font-medium rounded-lg shadow-sm hover:border-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-all">Clear
+          All Notes</button>
       </div>
-    </div>
-    <div id="noteDisplay" class="note-display">
-    </div>
-        <div class="summary">
-            <p><b>Total (after multiplier):</b> <span id="total">–</span></p>
-            <p><b>Monthly payment:</b> <span id="monthly">–</span></p>
-            <p class="muted">For equal plans: Monthly = Total ÷ Months. For olo3: 50% / 25% / 25% of Total.</p>
-          </div>
 
-        <table id="schedule" style="display:none">
-            <thead>
-                <tr>
-                    <th>Payment</th>
-                    <th>Amount</th>
-                  </tr>
-              </thead>
-            <tbody></tbody>
-            <tfoot>
-                <tr>
-                    <td>Total of payments shown</td>
-                    <td id="sumShown">–</td>
-                  </tr>
-              </tfoot>
-          </table>
+      <!-- *** MODIFIED: This is now a container for the list *** -->
+      <div id="noteDisplay" class="note-display mt-5 p-4 border rounded-lg space-y-3"
+        style="display:none; white-space: pre-wrap; word-break: break-word;">
+        <!-- Saved notes will be rendered here by JavaScript -->
+      </div>
+    </div> <!-- End Card 2 -->
 
-        <div class="actions">
-            <button id="copyBtn">📋 Copy Payment Schedule</button>
-          </div>
-     
-  </div>
-    <div>
-        <img src="image/i pad and tablet.jpg" alt="">
-        <img src="image/i phone.jpg" alt="">
-        <img src="image/pad pro 11 and 13.jpg" alt="">
-        <img src="image/samsuang.jpg" alt="">
-        <img src="image/watch and accessories.jpg" alt="">
-        <img src="image/discount.jpg" alt="">
+  </div> <!-- End Main Wrapper -->
 
-      </div>
 
-   
+  <!-- Your Images (Hidden for now, as they are not on the server) -->
+    <div class="hidden">
+        <img src="image/i pad and tablet.jpg" alt="">
+        <img src="image/i phone.jpg" alt="">
+        <img src="image/pad pro 11 and 13.jpg" alt="">
+        <img src="image/samsuang.jpg" alt="">
+        <img src="image/watch and accessories.jpg" alt="">
+        <img src="image/discount.jpg" alt="">
+      </div>
+
+   
   <script>
+    // --- JAVASCRIPT IS 100% CLEANED AND FIXED ---
+
     // --- Configuration ---
     const VISA_RULES = {
       Visa1: [2, 3, 4, 5],
@@ -311,20 +258,68 @@
     const sumShownEl = el('sumShown');
     const copyBtn = el('copyBtn');
 
-    // --- NEW Note Elements ---
     const noteInp = el('noteInput');
     const saveNoteBtn = el('saveNoteBtn');
     const clearNoteBtn = el('clearNoteBtn');
     const noteDisplay = el('noteDisplay');
-    // --- END NEW ---
 
-    let lastPayments = [];      // numbers of each payment
-    let lastPlanLabel = "";     // "3 months", "olo3 (50/25/25)", etc.
+    // --- *** NEW: Note State Management *** ---
+    let savedNotes = JSON.parse(localStorage.getItem('phoneCalcNotes')) || [];
+
+    let lastPayments = [];
+    let lastPlanLabel = "";
+
+    // --- *** NEW: Function to save notes to localStorage *** ---
+    function updateLocalStorage() {
+      localStorage.setItem('phoneCalcNotes', JSON.stringify(savedNotes));
+    }
+
+    // --- *** NEW: Function to render all notes *** ---
+    function renderNotes() {
+      noteDisplay.innerHTML = ''; // Clear existing notes
+      if (savedNotes.length === 0) {
+        noteDisplay.style.display = 'none'; // Hide container if empty
+        return;
+      }
+
+      noteDisplay.style.display = 'block'; // Show container
+
+      savedNotes.forEach(note => {
+        const noteEl = document.createElement('div');
+        noteEl.className = 'note-item flex items-center justify-between p-3 bg-yellow-50 rounded-lg';
+
+        const textEl = document.createElement('span');
+        textEl.className = 'text-sm text-yellow-900';
+        textEl.textContent = note.text;
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'delete-note-btn ml-3 p-1 text-red-500 hover:text-red-700 rounded-full hover:bg-red-100 transition-colors';
+        deleteBtn.dataset.noteId = note.id; // Set ID for deletion
+        deleteBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>`;
+
+        noteEl.appendChild(textEl);
+        noteEl.appendChild(deleteBtn);
+        noteDisplay.appendChild(noteEl);
+      });
+    }
+
+    // --- *** NEW: Function to handle clicking delete on a note *** ---
+    function handleDeleteNote(event) {
+      // Use .closest to find the button
+      const deleteButton = event.target.closest('.delete-note-btn');
+      if (deleteButton) {
+        const idToDelete = Number(deleteButton.dataset.noteId);
+        savedNotes = savedNotes.filter(note => note.id !== idToDelete);
+        updateLocalStorage();
+        renderNotes();
+      }
+    }
+    // --- *** END NEW FUNCTIONS *** ---
 
     function optionLabel(m) {
       if (typeof m === 'number' && Number.isFinite(m)) return `${m} month${m > 1 ? 's' : ''}`;
       if (m === 'olo3') return 'olo3 (50/25/25)';
-      return String(m); // show raw text for notes
+      return String(m);
     }
 
     function populateMonths() {
@@ -342,7 +337,8 @@
       const ph = document.createElement('option');
       ph.value = '';
       ph.textContent = 'Select plan…';
-      ph.disabled = true; ph.selected = true;
+      ph.disabled = true;
+      ph.selected = true;
       monthsSel.appendChild(ph);
 
       allowed.forEach(m => {
@@ -353,7 +349,6 @@
       });
     }
 
-    // Burmese month labels up to 12
     const burmeseLabels = [
       "ပထမလအတွက်က", "ဒုတိယလအတွက်က", "တတိယလအတွက်က", "စတုတ္ထလအတွက်က", "ပဉ္စမလအတွက်က",
       "ဆဌမလအတွက်က", "သတ္တမလအတွက်က", "အဠမလအတွက်က", "နဝမလအတွက်က", "ဒသမလအတွက်က",
@@ -361,11 +356,10 @@
     ];
 
     function calcAndRender() {
-      const selValue = monthsSel.value;                         // "3" | "4" | "5" | "olo3" | "to confirm to office"
+      const selValue = monthsSel.value;
       const price = Number(priceInp.value || 0);
       const discount = Math.max(0, Number(discountInp.value || 0));
 
-      // Guard
       if (!selValue || !isFinite(price) || price <= 0) {
         totalEl.textContent = '–';
         monthlyEl.textContent = '–';
@@ -381,9 +375,8 @@
       let total = 0;
 
       if (selValue === "olo3") {
-        // olo3 behaves like a 3-month plan for multiplier
         const months = 3;
-        const k = multiplierForMonths(months); // → 1.10
+        const k = multiplierForMonths(months);
         total = price * k;
 
         payments = [
@@ -395,7 +388,6 @@
         totalEl.textContent = fmt.format(total);
         monthlyEl.textContent = "Varies";
       } else if (/^\d+$/.test(selValue)) {
-        // Normal numeric plan
         const months = parseInt(selValue, 10);
         const k = multiplierForMonths(months);
         total = price * k;
@@ -410,7 +402,6 @@
         totalEl.textContent = fmt.format(total);
         monthlyEl.textContent = fmt.format(monthly);
       } else {
-        // Note / unsupported text
         totalEl.textContent = '–';
         monthlyEl.textContent = selValue;
         scheduleTbl.style.display = 'none';
@@ -421,44 +412,46 @@
         return;
       }
 
-      // Save for copy
       lastPayments = payments.slice();
       lastPlanLabel = monthsSel.options[monthsSel.selectedIndex]?.textContent || "";
 
-      // Render schedule
       scheduleBody.innerHTML = '';
       let sum = 0;
       payments.forEach((amt, i) => {
         sum += amt;
         const tr = document.createElement('tr');
+        tr.className = 'hover:bg-gray-50';
         const tdL = document.createElement('td');
         const tdR = document.createElement('td');
+        tdL.className = 'px-4 py-3';
+        tdR.className = 'px-4 py-3 text-right font-medium text-gray-900';
         tdL.textContent = `${i === 0 ? 'First' : i === 1 ? 'Second' : i === 2 ? 'Third' : (i + 1) + 'th'} payment`;
         tdR.textContent = fmt.format(amt);
-        tr.appendChild(tdL); tr.appendChild(tdR);
+        tr.appendChild(tdL);
+        tr.appendChild(tdR);
         scheduleBody.appendChild(tr);
       });
       sumShownEl.textContent = fmt.format(sum);
-      scheduleTbl.style.display = '';
+      scheduleTbl.style.display = 'table'; // Use 'table' instead of ''
     }
 
-    // --- NEW Note Functions ---
+    // --- *** MODIFIED: Renamed function *** ---
     function saveNote() {
       const noteText = noteInp.value.trim();
       if (noteText) {
-        noteDisplay.textContent = noteText;
-        noteDisplay.classList.add('visible');
-      } else {
-        clearNote(); // If they save an empty string, clear it
+        savedNotes.push({ id: Date.now(), text: noteText });
+        updateLocalStorage();
+        renderNotes();
+        noteInp.value = ''; // Clear input after saving
       }
     }
 
-    function clearNote() {
-      noteInp.value = '';
-      noteDisplay.textContent = '';
-      noteDisplay.classList.remove('visible');
+    // --- *** MODIFIED: Renamed function *** ---
+    function clearAllNotes() {
+      savedNotes = [];
+      updateLocalStorage();
+      renderNotes();
     }
-    // --- END NEW ---
 
     function copySchedule() {
       if (!lastPayments.length) {
@@ -466,38 +459,67 @@
         return;
       }
 
-      // --- MODIFIED to include note ---
+      // --- *** MODIFIED: Copies all notes *** ---
       let noteText = "";
-      if (noteDisplay.classList.contains('visible') && noteDisplay.textContent) {
-        noteText = `*** Note: ${noteDisplay.textContent.trim()} ***\n\n`;
+      if (savedNotes.length > 0) {
+        noteText = "*** Notes ***\n";
+        savedNotes.forEach(note => {
+          noteText += `- ${note.text}\n`;
+        });
+        noteText += "\n";
       }
 
-      let text = `${noteText}---- ${lastPlanLabel} အတွက်ဆိုရင်တော့\n`; // Note is added here
+      let text = `${noteText}---- ${lastPlanLabel} အတွက်ဆိုရင်တော့\n`;
       lastPayments.forEach((amt, i) => {
         const label = burmeseLabels[i] || `${i + 1} လအတွက်က`;
         text += `${label} ${fmt.format(amt)} w\n`;
       });
-      navigator.clipboard.writeText(text)
-        .then(() => alert("✅ Payment schedule (and note) copied!")) // Updated alert
-        .catch(() => alert("Copy failed—please allow clipboard permissions."));
-      // --- END MODIFICATION ---
+
+      // Fallback for clipboard
+      try {
+        navigator.clipboard.writeText(text)
+          .then(() => alert("✅ Payment schedule (and note) copied!"))
+          .catch(() => copyFallback(text)); // Use fallback on fail
+      } catch (err) {
+        copyFallback(text);
+      }
     }
 
-    // Events
+    // Fallback copy method for older browsers or restricted environments
+    function copyFallback(text) {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.position = "fixed";  // Avoid scrolling to bottom
+      textArea.style.top = "0";
+      textArea.style.left = "0";
+      textArea.style.opacity = "0";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        alert("✅ Payment schedule (and note) copied!");
+      } catch (err) {
+        alert("Copy failed. Please copy the text manually.");
+      }
+      document.body.removeChild(textArea);
+    }
+
+    // --- Event Listeners ---
     visaSel.addEventListener('change', () => { populateMonths(); calcAndRender(); });
     monthsSel.addEventListener('change', calcAndRender);
     priceInp.addEventListener('input', calcAndRender);
     discountInp.addEventListener('input', calcAndRender);
     copyBtn.addEventListener('click', copySchedule);
-
-    // --- NEW Note Events ---
+    // --- *** MODIFIED: Listeners updated *** ---
     saveNoteBtn.addEventListener('click', saveNote);
-    clearNoteBtn.addEventListener('click', clearNote);
-    // --- END NEW ---
+    clearNoteBtn.addEventListener('click', clearAllNotes);
+    noteDisplay.addEventListener('click', handleDeleteNote); // Listener for delete buttons
 
-    // Init
+    // --- Initial Load ---
     populateMonths();
     calcAndRender();
+    renderNotes(); // --- *** NEW: Load saved notes on page load *** ---
   </script>
 </body>
 
