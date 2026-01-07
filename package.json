@@ -1,14 +1,17 @@
 {
-  "name": "react-app",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
-  },
+  
+    "name": "myantechtownedit",
+    "private": true,
+    "version": "0.0.0",
+    "type": "module",
+    "homepage": "https://zeke-lab.github.io/MyanTechTown",
+    "scripts": {
+      "dev": "vite",
+      "build": "vite build",
+      "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+      "preview": "vite preview"
+    },
+  
   "dependencies": {
     "@supabase/supabase-js": "^2.89.0",
     "firebase": "^12.7.0",
