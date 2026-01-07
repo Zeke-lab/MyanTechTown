@@ -3,8 +3,11 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
 export default defineConfig({
-  base: "./", // Changed for GitHub Pages compatibility
+  base: '/MyanTechTown/', // Set base path for GitHub Pages
   plugins: [react()],
+  build: {
+    outDir: 'dist',
+  },
   server: {
     watch: {
       // Ignore common high-traffic system folders
