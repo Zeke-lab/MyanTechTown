@@ -256,20 +256,15 @@ function App() {
       return
     }
 
-    let noteText = ''
-    if (notes.length > 0) {
-      noteText = '*** Notes ***\\n'
-      notes.forEach((n) => {
-        noteText += `- ${n.text}\\n`
-      })
-      noteText += '\\n'
-    }
+    const itemName = 'Item'; // Placeholder: replace with actual item name if available
+    let text = `** ${itemName} လေးကို\nအရစ်ကျ plan လေးနဲ့သွင်းချင်တယ်ဆိုရင်ဆိုရင်တော့\n`;
 
-    let text = `${noteText}---- ${calculation.planLabel} အတွက်ဆိုရင်တော့\\n`
     calculation.payments.forEach((amt, i) => {
-      const label = burmeseLabels[i] || `${i + 1} လအတွက်က`
-      text += `${label} ${fmt.format(amt)} w\\n`
-    })
+      const label = burmeseLabels[i] || `${i + 1} လအတွက်က`;
+      text += `${label} ${fmt.format(amt)}\n`;
+    });
+
+    text += 'ပေးသွင်းရင်ရပါပြီရှင့်';
 
     const fallbackCopy = () => {
       const textarea = document.createElement('textarea')
@@ -281,7 +276,7 @@ function App() {
       textarea.select()
       try {
         document.execCommand('copy')
-        alert('✅ Payment schedule (and note) copied!')
+        alert('✅ Payment schedule copied!')
       } catch {
         alert('Copy failed. Please copy the text manually.')
       }
@@ -291,7 +286,7 @@ function App() {
     if (navigator?.clipboard?.writeText) {
       navigator.clipboard
         .writeText(text)
-        .then(() => alert('✅ Payment schedule (and note) copied!'))
+        .then(() => alert('✅ Payment schedule copied!'))
         .catch(fallbackCopy)
     } else {
       fallbackCopy()
