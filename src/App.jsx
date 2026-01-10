@@ -250,6 +250,35 @@ function App() {
     setSavingNote(false)
   }
 
+  const copySingleNote = (text) => {
+    const fallbackCopy = () => {
+      const textarea = document.createElement('textarea')
+      textarea.value = text
+      textarea.style.position = 'fixed'
+      textarea.style.opacity = '0'
+      document.body.appendChild(textarea)
+      textarea.focus()
+      textarea.select()
+      try {
+        document.execCommand('copy')
+        alert('✅ Note copied!')
+      } catch {
+        alert('Copy failed. Please copy the text manually.')
+      }
+      document.body.removeChild(textarea)
+    }
+
+    if (navigator?.clipboard?.writeText) {
+      navigator.clipboard
+        .writeText(text)
+        .then(() => alert('✅ Note copied!'))
+        .catch(fallbackCopy)
+    } else {
+      fallbackCopy()
+    }
+  }
+
+
   const copySchedule = () => {
     if (!calculation.payments.length) {
       alert('ရွေးချယ်ပြီးတွက်ပြီးမှ ကော်ပီလုပ်နိုင်ပါတယ်။')
@@ -502,14 +531,27 @@ function App() {
                   className="note-item flex items-center justify-between p-3 bg-yellow-50 rounded-lg border border-amber-200"
                 >
                   <span className="text-sm text-amber-900">{note.text}</span>
-                  <button
-                    type="button"
-                    onClick={() => deleteNoteById(note.id)}
-                    className="ml-3 p-1 text-red-500 hover:text-red-700 rounded-full hover:bg-red-100 transition-colors disabled:opacity-60"
-                    disabled={savingNote}
-                  >
-                    ✕
-        </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => copySingleNote(note.text)}
+                      className="p-1 text-blue-500 hover:text-blue-700 rounded-full hover:bg-blue-100 transition-colors"
+                      title="Copy note"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2" stroke="currentColor" fill="none"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" fill="none"></path>
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => deleteNoteById(note.id)}
+                      className="ml-3 p-1 text-red-500 hover:text-red-700 rounded-full hover:bg-red-100 transition-colors disabled:opacity-60"
+                      disabled={savingNote}
+                    >
+                      ✕
+          </button>
+                  </div>
                 </div>
               ))
             )}
